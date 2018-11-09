@@ -1,0 +1,3 @@
+db:
+  uri: 'xxxx://xxx:yyy@xxx.com/db'
+  debug: false
