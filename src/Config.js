@@ -9,10 +9,7 @@ Config.isArray = function (value) {
 
 var config = {
 
-    _new: function (options) {
-
-        this._merge = require('merge');
-
+    _new: function (options = {}) {
         var Provider = require('nconf').Provider;
         this._config = new Provider();
 
@@ -23,7 +20,9 @@ var config = {
         this.configName = 'config';
         this.parametersName = 'parameters';
 
-        this._merge(this, {}, options || {});
+        for (let key in options) {
+            this[key] = options[key];
+        }
 
         if (!Config.isArray(this.dir))
             this.dir = [this.dir];
@@ -61,7 +60,7 @@ var config = {
         this._config.load();
 
         this._config.set('env', this.env);
-        this.options = this._merge(this.options, this._config.get('NODE_CONFIG') || {});
+        this.options = {...this.options, ...(this._config.get('NODE_CONFIG') || {})};
 
         this._loadXConfig();
         this._setupOptions();
