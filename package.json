@@ -1,6 +1,6 @@
 {
   "name": "plus.config",
-  "version": "0.1",
+  "version": "1.1",
   "description": "",
   "main": "src/Config.js",
   "homepage": "https://bitbucket.org/slavahatnuke/plus.config",
@@ -15,7 +15,6 @@
   },
   "readmeFilename": "README.md",
   "author": "slava hatnuke",
-  "license": "BSD",
   "devDependencies": {},
   "dependencies": {}
 }
