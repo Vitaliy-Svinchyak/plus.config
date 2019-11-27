@@ -1,6 +1,6 @@
 {
   "name": "plus.config",
-  "version": "1.0.10",
+  "version": "0.1",
   "description": "",
   "main": "src/Config.js",
   "homepage": "https://bitbucket.org/slavahatnuke/plus.config",
@@ -16,15 +16,6 @@
   "readmeFilename": "README.md",
   "author": "slava hatnuke",
   "license": "BSD",
-  "devDependencies": {
-    "chai": "~1.9.1",
-    "mocha": "~1.18.2",
-    "istanbul": "~0.2.8",
-    "plus.cucumber.code": "~1.0.0",
-    "cucumber": "~0.4.0"
-  },
-  "dependencies": {
-    "config": "1.16.0",
-    "nconf": "0.6.9"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }

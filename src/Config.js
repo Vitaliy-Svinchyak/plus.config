@@ -1,103 +1,47 @@
-function Config(options) {
-    this._new(options);
-}
+const merge = require('merge')
 
-Config.isArray = function (value) {
-    return Object.prototype.toString.call(value) === '[object Array]';
-}
+class Config {
 
+    constructor (options) {
+        this.dir = options.dir
+        this.env = options.env
+        this._load()
+    }
 
-var config = {
+    _load () {
+        const defaultConfig = require(this.dir + '/default.js')
+        const envConfig = require(this.dir + `/${this.env}.js`)
+        this.config = merge(defaultConfig, envConfig)
+    }
 
-    _new: function (options = {}) {
-        var Provider = require('nconf').Provider;
-        this._config = new Provider();
+    get (name) {
+        const path = name.split(':')
+        let value = this.config
 
-        this.dir = '.';
-        this.env = 'dev';
-        this.options = {};
-
-        this.configName = 'config';
-        this.parametersName = 'parameters';
-
-        for (let key in options) {
-            this[key] = options[key];
+        for (let key of path) {
+            value = value[key]
         }
 
-        if (!Config.isArray(this.dir))
-            this.dir = [this.dir];
+        return value
+    }
 
-        this._setup();
-        this._load();
+    set (name, value) {
+        const path = name.split(':')
+        let currentValue = this.config
 
-    },
-    _addFiles: function () {
-
-        var dirs = this.dir.slice().reverse();
-
-        for (var i = 0; i < dirs.length; i++) {
-            var dir = dirs[i];
-            this._config.add('parameters-' + i, {type: 'file', file: dir + '/' + this.parametersName + '.json'});
-            this._config.add('environment-' + i, {
-                type: 'file',
-                file: dir + '/' + this.configName + '_' + this.env + '.json'
-            });
-            this._config.add('global-' + i, {type: 'file', file: dir + '/' + this.configName + '.json'});
+        for (let i = 0; path.length > 1 && i < path.length; i++) {
+            currentValue = currentValue[path[i]]
+            if (i === path.length - 2) {
+                break
+            }
         }
-    },
-    _setupOptions: function () {
-        this.fill(this.options);
-    },
-    _setup: function () {
+        currentValue[path.pop()] = value
+    }
 
-        this._setupOptions();
-
-        this._config.env("__");
-        this._addFiles();
-    },
-
-    _load: function () {
-        this._config.load();
-
-        this._config.set('env', this.env);
-        this.options = {...this.options, ...(this._config.get('NODE_CONFIG') || {})};
-
-        this._loadXConfig();
-        this._setupOptions();
-    },
-    _loadXConfig: function () {
-        process.env.NODE_ENV = this.env;
-        process.env.SUPPRESS_NO_CONFIG_WARNING = 1;
-
-        for (var i = 0; i < this.dir.length; i++) {
-            process.env.NODE_CONFIG_DIR = this.dir[i];
-            this._xConfig = require('config');
-
-            this.fill(this._xConfig);
-            this.fill(this._xConfig.util.loadFileConfigs());
-        }
-    },
-    get: function (name) {
-        name = name ? ('' + name).replace('.', ':') : name;
-        return this._config.get(name);
-    },
-    set: function (name, value) {
-        name = name ? ('' + name).replace('.', ':') : name;
-        this._config.set(name, value);
-    },
-
-    load: function (options) {
-        this.fill(new Config(options).get());
-        this._setupOptions();
-    },
-
-    fill: function (options) {
-        this._config.merge(options || {});
+    fill (options) {
+        this.config = merge(this.config, options || {})
     }
 
 }
 
-for (var i in config)
-    Config.prototype[i] = config[i];
-
-module.exports = Config;
+module.exports = Config
